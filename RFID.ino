@@ -14,6 +14,34 @@
 #define SS_PIN 53
 #define RST_PIN 14
 
+
+AsyncWebServer server(80);
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", "Hello, World!");
+  });
+  server.on("/ligar", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(2, HIGH); // Substitua 2 pelo pino do LED
+    request->send(200, "text/plain", "LED ligado");
+  });
+  server.on("/desligar", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(2, LOW);
+    request->send(200, "text/plain", "LED desligado");
+  });
+  server.begin();
+}
+
+void loop() {
+
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 const char* ssid = "UAIFAI"; 
@@ -58,4 +86,5 @@ void loop() {
 
     }
   }
+}
 }
